@@ -1,19 +1,3 @@
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-})const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-})const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-})
 const express = require("express")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
@@ -23,13 +7,11 @@ const cors = require("cors")
 const app = express()
 app.use(cors())
 app.use(express.json())
-
 const pool = new Pool({
-  user: "vanshsvashasanlabs",
-  host: "localhost",
-  database: "svashasan",
-  password: "",
-  port: 5432
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 })
 
 app.post("/signup", async (req, res) => {
@@ -75,4 +57,8 @@ app.post("/login", async (req, res) => {
 app.listen(5000, () => {
   console.log("Server running on port 5000")
 })
+const PORT = process.env.PORT || 8080;
 
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
+});
