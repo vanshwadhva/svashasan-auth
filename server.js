@@ -3,6 +3,10 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const { Pool } = require("pg")
 const cors = require("cors")
+const crypto = require("crypto")
+
+// Temporary in-memory storage for QR login sessions
+const qrSessions = {}
 
 const app = express()
 app.use(cors())
@@ -54,9 +58,51 @@ app.post("/login", async (req, res) => {
   res.json({ token })
 })
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000")
+// Create QR login session
+app.post("/qr-session", (req, res) => {
+
+  const session_id = crypto.randomUUID()
+
+  qrSessions[session_id] = {
+    authenticated: false,
+    token: null
+  }
+
+  res.json({ session_id })
+
 })
+
+// Check QR session status
+app.get("/qr-status/:session_id", (req, res) => {
+
+  const session = qrSessions[req.params.session_id]
+
+  if (!session) {
+    return res.status(404).json({ error: "session not found" })
+  }
+
+  res.json(session)
+
+})
+
+// Confirm QR login from mobile
+app.post("/qr-confirm", (req, res) => {
+
+  const { session_id, token } = req.body
+
+  const session = qrSessions[session_id]
+
+  if (!session) {
+    return res.status(404).json({ error: "session not found" })
+  }
+
+  session.authenticated = true
+  session.token = token
+
+  res.json({ success: true })
+
+})
+
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
